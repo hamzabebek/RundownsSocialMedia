@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "708285766227",
+    "firebase_url": "https://rundowns-social-media-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "rundowns-social-media",
+    "storage_bucket": "rundowns-social-media.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708285766227:android:3f2dd8d08b58f999eb44a6",
+        "android_client_info": {
+          "package_name": "com.example.rundownssocialmedia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708285766227-g4rlurluei6pjepdouofdguor346plda.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrQkqErF-OeJml69cxCdLvw8hnPi8IGzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708285766227-g4rlurluei6pjepdouofdguor346plda.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
