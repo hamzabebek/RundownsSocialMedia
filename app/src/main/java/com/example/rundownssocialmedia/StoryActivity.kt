@@ -2,16 +2,12 @@ package com.example.rundownssocialmedia
 
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
-import com.example.rundownssocialmedia.Fragments.ProfileFragment
-import com.example.rundownssocialmedia.Model.Post
 import com.example.rundownssocialmedia.Model.Story
 import com.example.rundownssocialmedia.Model.User
 import com.example.rundownssocialmedia.databinding.ActivityStoryBinding

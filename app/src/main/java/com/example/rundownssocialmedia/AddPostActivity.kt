@@ -1,18 +1,15 @@
 package com.example.rundownssocialmedia
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -24,28 +21,26 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import java.util.UUID
 
 class AddPostActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityAddPostBinding
     private lateinit var storage : FirebaseStorage
-    private val cropActivityResultContracts = object : ActivityResultContract<Any?, Uri?>(){
-        override fun createIntent(context: Context, input: Any?): Intent {
-            return CropImage.activity()
-                .setAspectRatio(9,16)
-                .getIntent(this@AddPostActivity)
+    private var imageUri : Uri? = null
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+        } else {
+            val exception = result.error
+            print(exception)
         }
-
-        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-            return CropImage.getActivityResult(intent)?.uri
-        }
-
     }
-    private lateinit var activityResultLauncher : ActivityResultLauncher<Any?>
     private lateinit var permissionLauncher : ActivityResultLauncher<String>
-    var imageUri : Uri? = null
     private var myUrl : String = ""
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -66,12 +61,12 @@ class AddPostActivity : AppCompatActivity() {
                     permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
             }
         }else{
-            activityResultLauncher.launch(null)
+            startCrop()
         }
 
         binding.saveNewPostBtn.setOnClickListener { uploadImage() }
         binding.imagePost.setOnClickListener {
-            activityResultLauncher.launch(null)
+            startCrop()
         }
         binding.closeAddPostBtn.setOnClickListener {
             val mainIntent = Intent(this@AddPostActivity,MainActivity::class.java)
@@ -135,19 +130,25 @@ class AddPostActivity : AppCompatActivity() {
             }
         }
     }
+    private fun startCrop(){
+        cropImage.launch(
+            CropImageContractOptions(
+                uri = imageUri,
+                cropImageOptions = CropImageOptions(
+                    guidelines = CropImageView.Guidelines.ON,
+                    outputCompressFormat = Bitmap.CompressFormat.PNG,
+                    aspectRatioX = 9,
+                    aspectRatioY = 16
+                )
+            )
+        )
+        binding.imagePost.setImageURI(imageUri)
+    }
     private fun registerLauncher(){
-
-        activityResultLauncher = registerForActivityResult(cropActivityResultContracts){
-            it?.let { uri ->
-                imageUri = uri
-                binding.imagePost.setImageURI(uri)
-
-            }
-        }
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ result ->
             if (result){
                 //permission granted
-                activityResultLauncher.launch(null)
+                startCrop()
             }else{
                 //permission denied
                 Toast.makeText(this@AddPostActivity,"Permission Needed ! ", Toast.LENGTH_SHORT).show()

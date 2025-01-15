@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.example.rundownssocialmedia'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.rundownssocialmedia"
@@ -31,7 +31,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures {
+    buildFeatures{
         viewBinding true
     }
 }
@@ -57,7 +57,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    implementation 'com.vanniktech:android-image-cropper:4.4.0'
     implementation 'com.github.shts:StoriesProgressView:3.0.0'
 
 }

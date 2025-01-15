@@ -1,22 +1,19 @@
 package com.example.rundownssocialmedia
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.rundownssocialmedia.databinding.ActivityAddPostBinding
 import com.example.rundownssocialmedia.databinding.ActivityAddStoryBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -25,7 +22,10 @@ import com.google.firebase.database.ServerValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -33,21 +33,16 @@ class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityAddStoryBinding
     private lateinit var storage : FirebaseStorage
-    private val cropActivityResultContracts = object : ActivityResultContract<Any?, Uri?>(){
-        override fun createIntent(context: Context, input: Any?): Intent {
-            return CropImage.activity()
-                .setAspectRatio(9,16)
-                .getIntent(this@AddStoryActivity)
+    private var imageUri : Uri? = null
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+        } else {
+            val exception = result.error
+            print(exception)
         }
-
-        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-            return CropImage.getActivityResult(intent)?.uri
-        }
-
     }
-    private lateinit var activityResultLauncher : ActivityResultLauncher<Any?>
     private lateinit var permissionLauncher : ActivityResultLauncher<String>
-    var imageUri : Uri? = null
     private var myUrl : String = ""
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,22 +67,28 @@ class AddStoryActivity : AppCompatActivity() {
 
             }
         }else{
-            activityResultLauncher.launch(null)
+            startCrop()
         }
     }
+    private fun startCrop(){
+        cropImage.launch(
+            CropImageContractOptions(
+                uri = imageUri,
+                cropImageOptions = CropImageOptions(
+                    guidelines = CropImageView.Guidelines.ON,
+                    outputCompressFormat = Bitmap.CompressFormat.PNG,
+                    aspectRatioX = 9,
+                    aspectRatioY = 16
+                )
+            )
+        )
+        uploadStory()
+    }
     private fun registerLauncher(){
-
-        activityResultLauncher = registerForActivityResult(cropActivityResultContracts){
-            it?.let { uri ->
-                imageUri = uri
-                uploadStory()
-
-            }
-        }
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ result ->
             if (result){
                 //permission granted
-                activityResultLauncher.launch(null)
+                startCrop()
             }else{
                 //permission denied
                 Toast.makeText(this@AddStoryActivity,"Permission Needed ! ", Toast.LENGTH_SHORT).show()
