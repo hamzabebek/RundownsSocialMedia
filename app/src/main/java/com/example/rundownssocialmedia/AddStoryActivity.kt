@@ -37,6 +37,7 @@ class AddStoryActivity : AppCompatActivity() {
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             imageUri = result.uriContent
+            uploadStory()
         } else {
             val exception = result.error
             print(exception)
@@ -59,12 +60,9 @@ class AddStoryActivity : AppCompatActivity() {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@AddStoryActivity,android.Manifest.permission.READ_MEDIA_IMAGES)){
                 Snackbar.make(view,"Permission needed for Gallery !!", Snackbar.LENGTH_INDEFINITE).setAction("Give Permission"){
                         permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
-
                 }.show()
             }else{
-
                     permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
-
             }
         }else{
             startCrop()
@@ -82,7 +80,6 @@ class AddStoryActivity : AppCompatActivity() {
                 )
             )
         )
-        uploadStory()
     }
     private fun registerLauncher(){
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ result ->
@@ -100,7 +97,6 @@ class AddStoryActivity : AppCompatActivity() {
     @Suppress("DEPRECATION")
     private fun uploadStory() {
         when{
-
             imageUri == null -> Toast.makeText(this,"Please select image first",Toast.LENGTH_SHORT).show()
             else ->{
                 val progressDialog = ProgressDialog(this@AddStoryActivity)
